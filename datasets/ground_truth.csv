@@ -1,0 +1,1 @@
+event_id,phase,start_utc,end_utc,src_ip,dst_ip,protocol,action,description,expected_observable
