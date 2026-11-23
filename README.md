@@ -1,65 +1,81 @@
 # Enterprise Network Forensics Lab
 
-An integrated, offline-first network forensics framework for
-investigating suspicious network activity through packet analysis,
-network metadata extraction, intrusion detection, evidence correlation,
-and incident reconstruction.
+An offline-first framework that reconstructs suspicious network activity by combining packet analysis, protocol metadata and intrusion detection, then correlating the results into a single investigation timeline.
 
-## Project Objectives
+> **Status:** Design and early implementation. Features listed under *Planned* are not yet implemented.
 
-- Analyze network traffic from PCAP/PCAPNG files.
-- Extract packet-level information using TShark.
-- Generate network metadata using Zeek.
-- Identify suspicious activity using Suricata.
-- Correlate findings using Python.
-- Preserve evidence integrity using SHA-256.
-- Store structured investigation results in SQLite.
-- Generate reproducible forensic investigation reports.
+---
 
-## Architecture
+## Overview
 
-The proposed workflow uses three independent analysis tools:
+A single network tool shows only part of an incident. This project analyzes **the same PCAP** with three independent tools and merges their output, so each finding can be traced back to its source.
 
-1. TShark: packet-level inspection.
-2. Zeek: network connection and protocol metadata.
-3. Suricata: signature-based intrusion detection.
+| Tool | Role |
+|---|---|
+| **TShark** | Packet-level inspection |
+| **Zeek** | Connection and protocol metadata |
+| **Suricata** | Signature-based detection |
+| **Python** | Normalization, correlation, reporting |
 
-Python will normalize and correlate their outputs.
+## Workflow
 
-## Technology Stack
+```
+PCAP/PCAPNG -> SHA-256 check -> TShark / Zeek / Suricata -> Python correlation -> SQLite -> Report
+```
 
-| Technology | Purpose |
+1. **Acquire:** capture traffic and record its SHA-256 hash.
+2. **Verify:** confirm the hash before every analysis.
+3. **Analyze:** process the same file with all three tools.
+4. **Correlate:** join events using Community ID, the 5-tuple and a time window.
+5. **Report:** produce a timeline with references to the source evidence.
+
+## Planned Lab Scenario
+
+A simulated workstation compromise in an isolated lab, in four phases:
+
+1. **Reconnaissance:** port scan of a lab server
+2. **Command and control:** periodic HTTP and DNS beaconing
+3. **Exfiltration:** large file upload
+4. **Encrypted repeat:** the same activity over TLS, to measure evidence loss
+
+Each action is recorded in a ground-truth file so detection coverage can be measured.
+
+## Objectives
+
+- Analyze traffic from PCAP/PCAPNG files
+- Extract packet details with TShark
+- Generate network metadata with Zeek
+- Detect suspicious activity with Suricata
+- Correlate findings with Python
+- Preserve evidence integrity with SHA-256
+- Store results in SQLite
+- Generate reproducible investigation reports
+
+## Technology
+
+| Component | Purpose |
 |---|---|
 | Python | Orchestration and correlation |
 | TShark | Packet analysis |
 | Zeek | Network metadata |
 | Suricata | Intrusion detection |
 | SQLite | Evidence storage |
-| SHA-256 | Integrity verification |
 | Git | Version control |
 
-## Project Status
+## Scope
 
-Currently in the design and initial implementation phase.
+**In scope:** offline PCAP analysis in a controlled lab.
 
-Planned capabilities are not yet claimed as implemented.
+**Out of scope:** live capture, production deployment, and decryption of encrypted traffic beyond available metadata.
 
-## Repository Structure
+## Documentation
 
-See the `docs/` directory for architecture, methodology,
-research scope, evidence handling, and testing documentation.
-
-## Investigation Scope
-
-The initial implementation focuses on offline PCAP analysis.
-Live capture, encrypted traffic inspection beyond available metadata,
-and production deployment are outside the initial scope.
+The `docs/` folder covers architecture, methodology, research scope, evidence handling and testing.
 
 ## Ethical Use
 
-Use only traffic that you own, have permission to analyze,
-or that is explicitly provided for research and educational use.
+Use only traffic that you own, have permission to analyze, or that is provided for research and educational purposes. All attack traffic in this project is generated against the author's own lab.
 
 ## License
 
-See [LICENSE](LICENSE).
+See [LICENSE](https://github.com/doudi230604/Network-forensics-lab/blob/main/LICENSE).
